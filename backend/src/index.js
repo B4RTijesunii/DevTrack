@@ -7,6 +7,7 @@ import syncRoutes from "./routes/sync.js";
 import dashboardRoutes from "./routes/dashboard.js";
 import reportsRoutes from "./routes/reports.js";
 import { startCronJobs } from "./lib/cron.js";
+import goalsRoutes from "./routes/goals.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -37,6 +38,7 @@ app.use("/auth", authRoutes);
 app.use("/api", syncRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", reportsRoutes);
+app.use("/api", goalsRoutes);
 
 app.get("/test-cookie-set", (req, res) => {
   req.session.testValue = "hello-" + Date.now();
