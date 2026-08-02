@@ -5,11 +5,12 @@ import cookieSession from "cookie-session";
 import authRoutes from "./routes/auth.js";
 import syncRoutes from "./routes/sync.js";
 import dashboardRoutes from "./routes/dashboard.js";
-import { startCronJobs } from "./lib/cron.js";
 import reportsRoutes from "./routes/reports.js";
+import { startCronJobs } from "./lib/cron.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
   cors({
@@ -25,7 +26,8 @@ app.use(
     secret: process.env.SESSION_SECRET,
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
   }),
 );
 
@@ -37,6 +39,7 @@ app.use("/api", reportsRoutes);
 app.get("/", (req, res) => {
   res.json({ status: "DevTrack backend running" });
 });
+
 startCronJobs();
 
 app.listen(PORT, () => {
