@@ -130,3 +130,9 @@ export async function getLatestMonthlyReview(userId) {
     orderBy: { periodStart: "desc" },
   });
 }
+export async function getAllMonthlyReviews(userId) {
+  return prisma.periodSummary.findMany({
+    where: { userId, periodType: "month" },
+    orderBy: { periodStart: "desc" },
+  });
+}

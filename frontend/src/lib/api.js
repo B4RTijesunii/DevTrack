@@ -35,6 +35,7 @@ export const api = {
   monthlyReview: {
     generate: () => request("/api/reports/monthly", { method: "POST" }),
     latest: () => request("/api/reports/monthly"),
+    all: () => request("/api/reports/monthly/all"),
   },
 };
 
