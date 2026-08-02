@@ -9,6 +9,7 @@ import reportsRoutes from "./routes/reports.js";
 import { startCronJobs } from "./lib/cron.js";
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 4000;
 const isProduction = process.env.NODE_ENV === "production";
 console.log("[DEBUG] isProduction at startup:", isProduction);
