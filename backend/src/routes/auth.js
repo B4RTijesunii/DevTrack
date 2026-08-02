@@ -80,7 +80,9 @@ router.get("/github/callback", async (req, res) => {
         accessToken: encrypt(accessToken),
       },
     });
-
+    console.log("[DEBUG] About to set session for user:", user.id);
+    req.session.userId = user.id;
+    console.log("[DEBUG] Session set successfully");
     req.session.userId = user.id;
     console.log(
       "[DEBUG] Session set for user:",
@@ -90,7 +92,10 @@ router.get("/github/callback", async (req, res) => {
     );
     res.redirect(`${FRONTEND_URL}/overview`);
   } catch (err) {
-    console.error("OAuth callback error:", err);
+    console.error("=== OAUTH CALLBACK ERROR ===");
+    console.error("Message:", err.message);
+    console.error("Stack:", err.stack);
+    console.error("=============================");
     res.redirect(`${FRONTEND_URL}/login?error=server_error`);
   }
 });
