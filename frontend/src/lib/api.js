@@ -26,6 +26,12 @@ export const api = {
     request(
       `/api/milestones${repo ? `?repo=${encodeURIComponent(repo)}` : ""}`,
     ),
+  goals: {
+    list: () => request("/api/goals"),
+    create: (goal) =>
+      request("/api/goals", { method: "POST", body: JSON.stringify(goal) }),
+    remove: (id) => request(`/api/goals/${id}`, { method: "DELETE" }),
+  },
   monthlyReview: {
     generate: () => request("/api/reports/monthly", { method: "POST" }),
     latest: () => request("/api/reports/monthly"),
