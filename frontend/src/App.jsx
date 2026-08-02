@@ -31,7 +31,7 @@ export default function App() {
       >
         <Route path="/overview" element={<Overview />} />
         <Route path="/projects" element={<Projects />} />
-        <Route path="/analytics" element={<Placeholder name="Analytics" />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/milestones" element={<Placeholder name="Milestones" />} />
         <Route path="/goals" element={<Placeholder name="Goals" />} />
         <Route path="/reports" element={<Placeholder name="Reports" />} />
