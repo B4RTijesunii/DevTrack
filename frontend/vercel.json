@@ -1,3 +1,13 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://devtrack-backend-f9wf.onrender.com/api/$1"
+    },
+    {
+      "source": "/auth/(.*)",
+      "destination": "https://devtrack-backend-f9wf.onrender.com/auth/$1"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
