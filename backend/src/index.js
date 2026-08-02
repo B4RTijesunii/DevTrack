@@ -11,6 +11,7 @@ import { startCronJobs } from "./lib/cron.js";
 const app = express();
 const PORT = process.env.PORT || 4000;
 const isProduction = process.env.NODE_ENV === "production";
+console.log("[DEBUG] isProduction at startup:", isProduction);
 
 app.use(
   cors({

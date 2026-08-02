@@ -82,7 +82,12 @@ router.get("/github/callback", async (req, res) => {
     });
 
     req.session.userId = user.id;
-
+    console.log(
+      "[DEBUG] Session set for user:",
+      user.id,
+      "| NODE_ENV:",
+      process.env.NODE_ENV,
+    );
     res.redirect(`${FRONTEND_URL}/overview`);
   } catch (err) {
     console.error("OAuth callback error:", err);
