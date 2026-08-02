@@ -38,6 +38,19 @@ app.use("/api", syncRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", reportsRoutes);
 
+app.get("/test-cookie-set", (req, res) => {
+  req.session.testValue = "hello-" + Date.now();
+  console.log("[TEST] Set session value:", req.session.testValue);
+  res.json({ ok: true, set: req.session.testValue });
+});
+
+app.get("/test-cookie-check", (req, res) => {
+  console.log("[TEST] Read session value:", req.session.testValue);
+  res.json({
+    ok: true,
+    sessionValue: req.session.testValue ?? "NOTHING FOUND",
+  });
+});
 app.get("/", (req, res) => {
   res.json({ status: "DevTrack backend running" });
 });
