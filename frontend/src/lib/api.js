@@ -22,6 +22,10 @@ export const api = {
   overview: () => request("/api/overview"),
   projects: () => request("/api/projects"),
   analytics: () => request("/api/analytics"),
+  milestones: (repo) =>
+    request(
+      `/api/milestones${repo ? `?repo=${encodeURIComponent(repo)}` : ""}`,
+    ),
   monthlyReview: {
     generate: () => request("/api/reports/monthly", { method: "POST" }),
     latest: () => request("/api/reports/monthly"),

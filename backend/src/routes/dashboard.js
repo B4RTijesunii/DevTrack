@@ -4,6 +4,7 @@ import {
   getOverviewStats,
   getProjectsOverview,
   getAnalyticsStats,
+  getMilestonesFeed,
 } from "../services/stats.js";
 
 const router = Router();
@@ -43,6 +44,19 @@ router.get("/analytics", requireAuth, async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to load analytics", detail: err.message });
+  }
+});
+// GET /api/milestones — combined PR/issue feed, optionally filtered by repo
+router.get("/milestones", requireAuth, async (req, res) => {
+  try {
+    const repoFilter = req.query.repo || null;
+    const data = await getMilestonesFeed(req.session.userId, repoFilter);
+    res.json(data);
+  } catch (err) {
+    console.error("Failed to load milestones:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to load milestones", detail: err.message });
   }
 });
 export default router;

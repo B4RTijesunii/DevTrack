@@ -327,3 +327,57 @@ export async function getAnalyticsStats(userId) {
 
   return { weeklyTrend, monthlyTrend, topRepos };
 }
+// --- Milestones: combined feed of merged PRs + closed issues ----------
+
+export async function getMilestonesFeed(userId, repoFilter = null) {
+  const repos = await prisma.repo.findMany({
+    where: { userId },
+    select: { id: true, name: true },
+  });
+
+  const filteredRepos = repoFilter
+    ? repos.filter((r) => r.name === repoFilter)
+    : repos;
+  const repoIds = filteredRepos.map((r) => r.id);
+  const repoNameById = Object.fromEntries(
+    filteredRepos.map((r) => [r.id, r.name]),
+  );
+
+  if (repoIds.length === 0) {
+    return { milestones: [], repoNames: repos.map((r) => r.name) };
+  }
+
+  const [mergedPRs, closedIssues] = await Promise.all([
+    prisma.pullRequest.findMany({
+      where: { repoId: { in: repoIds }, state: "merged" },
+      orderBy: { mergedAt: "desc" },
+      take: 100,
+    }),
+    prisma.issue.findMany({
+      where: { repoId: { in: repoIds }, state: "closed" },
+      orderBy: { closedAt: "desc" },
+      take: 100,
+    }),
+  ]);
+
+  const milestones = [
+    ...mergedPRs.map((pr) => ({
+      id: `pr-${pr.id}`,
+      type: "pr",
+      title: pr.title,
+      repoName: repoNameById[pr.repoId],
+      date: pr.mergedAt,
+    })),
+    ...closedIssues.map((issue) => ({
+      id: `issue-${issue.id}`,
+      type: "issue",
+      title: issue.title,
+      repoName: repoNameById[issue.repoId],
+      date: issue.closedAt,
+    })),
+  ]
+    .filter((m) => m.date)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  return { milestones, repoNames: repos.map((r) => r.name) };
+}

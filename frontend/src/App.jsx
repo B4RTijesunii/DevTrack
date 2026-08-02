@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Overview from "./pages/Overview";
 import Layout from "./components/Layout";
 import Projects from "./pages/Projects";
+import Analytics from "./pages/Analytics";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
