@@ -55,6 +55,27 @@ export default function Overview() {
       <div className="p-8 text-red-400 text-sm">Failed to load overview.</div>
     );
   }
+  if (data.totalCommits.value === 0 && data.projectsWorkedOn.value === 0) {
+    return (
+      <div className="p-8">
+        <div className="bg-[#12161D] rounded-xl p-8 text-center">
+          <p className="text-sm text-white font-medium mb-2">
+            Setting things up...
+          </p>
+          <p className="text-xs text-[#8A8F99] mb-4">
+            We're pulling in your GitHub activity for the first time. This can
+            take a few seconds for a lot of repos.
+          </p>
+          <button
+            onClick={refreshOverview}
+            className="text-xs bg-[#151A21] text-[#C9CDD3] px-4 py-2 rounded-lg"
+          >
+            🔄 Check again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const maxCommits = Math.max(...data.commitsPerDay, 1);
 
