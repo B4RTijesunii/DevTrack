@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { getOverviewStats, getProjectsOverview } from "../services/stats.js";
+import {
+  getOverviewStats,
+  getProjectsOverview,
+  getAnalyticsStats,
+} from "../services/stats.js";
 
 const router = Router();
 
@@ -26,6 +30,19 @@ router.get("/projects", requireAuth, async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to load projects", detail: err.message });
+  }
+});
+
+// GET /api/analytics — multi-week/month trends
+router.get("/analytics", requireAuth, async (req, res) => {
+  try {
+    const analytics = await getAnalyticsStats(req.session.userId);
+    res.json(analytics);
+  } catch (err) {
+    console.error("Failed to load analytics:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to load analytics", detail: err.message });
   }
 });
 export default router;

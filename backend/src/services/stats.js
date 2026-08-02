@@ -257,3 +257,73 @@ export async function getProjectsOverview(userId) {
     return new Date(b.lastCommitAt) - new Date(a.lastCommitAt);
   });
 }
+
+// --- Analytics: multi-week and multi-month trends ---------------------
+
+export async function getAnalyticsStats(userId) {
+  const repos = await getUserRepoIds(userId);
+  const repoIds = repos.map((r) => r.id);
+  if (repoIds.length === 0) {
+    return { weeklyTrend: [], monthlyTrend: [], topRepos: [] };
+  }
+
+  const now = new Date();
+
+  // Last 8 weeks of commit counts, oldest first
+  const weeklyTrend = [];
+  for (let i = 7; i >= 0; i--) {
+    const wStart = new Date(startOfWeek(now));
+    wStart.setDate(wStart.getDate() - i * 7);
+    const wEnd = endOfWeek(wStart);
+
+    const count = await prisma.commit.count({
+      where: { repoId: { in: repoIds }, authoredAt: { gte: wStart, lt: wEnd } },
+    });
+
+    weeklyTrend.push({
+      weekStart: wStart.toISOString().slice(0, 10),
+      commits: count,
+    });
+  }
+
+  // Last 6 months of commit counts + active days, oldest first
+  const monthlyTrend = [];
+  for (let i = 5; i >= 0; i--) {
+    const mDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const mStart = startOfMonth(mDate);
+    const mEnd = endOfMonth(mDate);
+
+    const commits = await prisma.commit.findMany({
+      where: { repoId: { in: repoIds }, authoredAt: { gte: mStart, lt: mEnd } },
+      select: { authoredAt: true },
+    });
+
+    const activeDates = new Set(commits.map((c) => dayKey(c.authoredAt)));
+
+    monthlyTrend.push({
+      month: mStart.toISOString().slice(0, 7), // "2026-08"
+      commits: commits.length,
+      activeDays: activeDates.size,
+    });
+  }
+
+  // Top repos over the last 90 days, by commit count
+  const ninetyDaysAgo = new Date(now);
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+  const recentCommits = await prisma.commit.findMany({
+    where: { repoId: { in: repoIds }, authoredAt: { gte: ninetyDaysAgo } },
+    include: { repo: { select: { name: true } } },
+  });
+
+  const perRepo = {};
+  for (const c of recentCommits) {
+    perRepo[c.repo.name] = (perRepo[c.repo.name] ?? 0) + 1;
+  }
+  const topRepos = Object.entries(perRepo)
+    .map(([name, commits]) => ({ name, commits }))
+    .sort((a, b) => b.commits - a.commits)
+    .slice(0, 5);
+
+  return { weeklyTrend, monthlyTrend, topRepos };
+}

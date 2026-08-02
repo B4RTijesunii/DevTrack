@@ -21,6 +21,7 @@ export const api = {
   sync: () => request("/api/sync", { method: "POST" }),
   overview: () => request("/api/overview"),
   projects: () => request("/api/projects"),
+  analytics: () => request("/api/analytics"),
   monthlyReview: {
     generate: () => request("/api/reports/monthly", { method: "POST" }),
     latest: () => request("/api/reports/monthly"),
