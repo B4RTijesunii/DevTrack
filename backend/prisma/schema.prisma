@@ -1,0 +1,123 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  githubId      String   @unique
+  username      String
+  avatarUrl     String?
+  accessToken   String
+  createdAt     DateTime @default(now())
+  lastSyncedAt  DateTime?
+
+  repos         Repo[]
+  goals         Goal[]
+  summaries     PeriodSummary[]
+}
+
+model Repo {
+  id             String   @id @default(cuid())
+  githubRepoId   String   @unique
+  name           String
+  fullName       String
+  isPrivate      Boolean  @default(false)
+  trackedSince   DateTime @default(now())
+  lastSyncedAt   DateTime?
+
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+
+  commits        Commit[]
+  pullRequests   PullRequest[]
+  issues         Issue[]
+
+  @@index([userId])
+}
+
+model Commit {
+  id           String   @id @default(cuid())
+  sha          String
+  message      String
+  additions    Int      @default(0)
+  deletions    Int      @default(0)
+  language     String?
+  authoredAt   DateTime
+  url          String?
+
+  repoId       String
+  repo         Repo     @relation(fields: [repoId], references: [id])
+
+  @@unique([repoId, sha])
+  @@index([authoredAt])
+}
+
+model PullRequest {
+  id             String    @id @default(cuid())
+  githubPrId     String
+  title          String
+  state          String
+  createdAt      DateTime
+  mergedAt       DateTime?
+
+  repoId         String
+  repo           Repo      @relation(fields: [repoId], references: [id])
+
+  @@unique([repoId, githubPrId])
+}
+
+model Issue {
+  id             String    @id @default(cuid())
+  githubIssueId  String
+  title          String
+  state          String
+  createdAt      DateTime
+  closedAt       DateTime?
+
+  repoId         String
+  repo           Repo      @relation(fields: [repoId], references: [id])
+
+  @@unique([repoId, githubIssueId])
+}
+
+model Goal {
+  id          String   @id @default(cuid())
+  type        String
+  target      Int
+  period      String
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model PeriodSummary {
+  id             String   @id @default(cuid())
+  periodType     String
+  periodStart    DateTime
+  periodEnd      DateTime
+
+  totalCommits   Int      @default(0)
+  activeDays     Int      @default(0)
+  reposTouched   Int      @default(0)
+  prsMerged      Int      @default(0)
+  issuesClosed   Int      @default(0)
+  linesAdded     Int      @default(0)
+  linesDeleted   Int      @default(0)
+
+  aiSummary      String?
+
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, periodType, periodStart])
+}
