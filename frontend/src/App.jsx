@@ -5,6 +5,7 @@ import Overview from "./pages/Overview";
 import Layout from "./components/Layout";
 import Projects from "./pages/Projects";
 import Analytics from "./pages/Analytics";
+import Milestones from "./pages/Milestones";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -33,7 +34,7 @@ export default function App() {
         <Route path="/overview" element={<Overview />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/milestones" element={<Placeholder name="Milestones" />} />
+        <Route path="/milestones" element={<Milestones />} />
         <Route path="/goals" element={<Placeholder name="Goals" />} />
         <Route path="/reports" element={<Placeholder name="Reports" />} />
         <Route path="/settings" element={<Placeholder name="Settings" />} />
